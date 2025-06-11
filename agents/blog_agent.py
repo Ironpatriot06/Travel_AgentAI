@@ -7,7 +7,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import requests
 import os
 
-os.environ["GOOGLE_API_KEY"] = "AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
+os.environ["GOOGLE_API_KEY"] = "your_api_key"
 os.environ["USER_AGENT"] = "RatishKapoorBot/1.0"
 
 embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")

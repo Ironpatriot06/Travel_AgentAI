@@ -18,8 +18,8 @@ This project is an interactive **travel planning assistant** built with **LangCh
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/dubai-travel-agent.git
-cd dubai-travel-agent
+git clone https://github.com/Ironpatriot06/Travel_AgentAI.git
+cd Travel_AgentAI
 ```
 
 FOR MacOS

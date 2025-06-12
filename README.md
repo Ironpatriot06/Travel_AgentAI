@@ -1,3 +1,4 @@
+
 # 🏝️ Dubai Travel Assistant Chatbot
 
 This project is an interactive **travel planning assistant** built with **LangChain**, **Google Gemini**, and **Streamlit**. It allows users to chat with a bot that can answer queries based on **scraped travel blogs** and even **generate a personalized itinerary** for a family trip to Dubai.
@@ -58,4 +59,5 @@ travel_agent/
 ├── tester.py               # Test Gemini model + list available models
 ├── agents/
       └── blog_agent.py                
+
 

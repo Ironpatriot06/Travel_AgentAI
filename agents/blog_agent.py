@@ -9,7 +9,7 @@ from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain.vectorstores import Chroma as LCChroma  # Alias if using langchain.vectorstores also
 
 # ✅ Set environment variables
-os.environ["GOOGLE_API_KEY"] = "AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
+os.environ["GOOGLE_API_KEY"] = "your_api_key"
 os.environ["USER_AGENT"] = "RatishKapoorBot/1.0"
 
 # ✅ Embedding model

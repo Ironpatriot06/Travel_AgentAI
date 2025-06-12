@@ -15,17 +15,17 @@ embedding = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 vectordb = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 
 # 🤖 Gemini Pro LLM
-llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.4)
-
+llm = ChatGoogleGenerativeAI(model="models/gemini-1.5-flash-002", temperature=0.4)
 # 💬 Memory for context
-memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, output_key="answer")
 
 # 🔍 Conversational chain with retriever
 qa_chain = ConversationalRetrievalChain.from_llm(
     llm=llm,
     retriever=vectordb.as_retriever(),
     memory=memory,
-    return_source_documents=True
+    return_source_documents=True,
+    output_key="answer"  # 👈 This resolves the error
 )
 
 # 🌐 Streamlit UI

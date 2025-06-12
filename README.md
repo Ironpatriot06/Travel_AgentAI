@@ -38,7 +38,7 @@ venv\Scripts\activate
 
 Install Dependencies
 ```bash
-pip install streamlit langchain google-generativeai langchain-google-genai chromadb tiktoken
+pip install -r requirements.txt
 ```
 
 Put your API key like this 

@@ -59,3 +59,14 @@ streamlit run app.py
 ```
 
 
+travel_agent/
+├── app.py                  # Streamlit frontend
+├── ingest.py               # Script to load travel blogs into Chroma DB
+├── vectorstore/ # Local vector DB folder
+    └── vectordb
+├── tester.py               # Test Gemini model + list available models
+├── requirements.txt        # Dependencies
+├── agents/        # Dependencies
+    └── blog_agent.py
+
+

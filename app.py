@@ -8,7 +8,7 @@ from langchain.prompts import PromptTemplate
 from langchain_chroma import Chroma
 
 # 🔐 API Key
-os.environ["GOOGLE_API_KEY"] = "AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
+os.environ["GOOGLE_API_KEY"] = "your_api_key"
 
 # 📚 Load Vector DB
 persist_directory = "vector_db/blogs"

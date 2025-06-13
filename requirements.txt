@@ -1,8 +1,12 @@
 langchain
+langchain-chroma
 langchain-community
 langchain-google-genai
 chromadb
 beautifulsoup4
+selenium
+webdriver-manager
+streamlit
 requests
 tqdm
 python-dotenv

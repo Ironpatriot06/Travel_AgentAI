@@ -1,10 +1,14 @@
 langchain
+langchain-chroma
 langchain-community
 langchain-google-genai
 chromadb
 beautifulsoup4
+selenium
+webdriver-manager
 requests
 tqdm
 python-dotenv
 openai
 PyYAML
+streamlit

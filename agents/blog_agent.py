@@ -8,8 +8,7 @@ from langchain_chroma import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain.vectorstores import Chroma as LCChroma  # Alias if using langchain.vectorstores also
 
-# ✅ Set environment variables
-os.environ["GOOGLE_API_KEY"] = "AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
+os.environ["GOOGLE_API_KEY"] = "your_api_key"
 os.environ["USER_AGENT"] = "RatishKapoorBot/1.0"
 
 # ✅ Embedding model
@@ -19,7 +18,7 @@ embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 def is_url_valid(url):
     try:
         headers = {"User-Agent": "RatishKapoorBot/1.0"}
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=30)
         return response.status_code == 200
     except:
         return False

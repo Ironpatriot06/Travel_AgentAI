@@ -1,0 +1,10 @@
+langchain
+langchain-community
+langchain-google-genai
+chromadb
+beautifulsoup4
+requests
+tqdm
+python-dotenv
+openai
+PyYAML

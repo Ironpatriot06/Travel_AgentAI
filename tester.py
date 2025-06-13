@@ -1,8 +1,16 @@
-import google.generativeai as genai
+from langchain_chroma import Chroma
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-genai.configure(api_key="AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc")
+embedding = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+vectordb = Chroma(persist_directory="vector_db/blogs", embedding_function=embedding)
 
-models = genai.list_models()
-for model in models:
-    print(model.name)
+# Get the raw documents that were embedded
+docs = vectordb.get()["documents"]
+
+# Search for the word "Savi"
+for i, doc in enumerate(docs):
+    if "savi" in doc.lower():
+        print(f"--- Match in chunk {i} ---")
+        print(doc)
+        print()
 

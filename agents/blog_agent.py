@@ -18,7 +18,7 @@ embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
 def is_url_valid(url):
     try:
         headers = {"User-Agent": "RatishKapoorBot/1.0"}
-        response = requests.get(url, headers=headers, timeout=10)
+        response = requests.get(url, headers=headers, timeout=30)
         return response.status_code == 200
     except:
         return False

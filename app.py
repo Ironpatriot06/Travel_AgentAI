@@ -41,12 +41,15 @@ Be concise, realistic, and helpful.
 llm = ChatGoogleGenerativeAI(model="models/gemini-1.5-flash-002", temperature=0.4)
 
 # 🧠 Memory
-memory = ConversationBufferMemory(
-    memory_key="chat_history",
-    return_messages=True,
-    input_key="question",
-    output_key="answer"
-)
+if "memory" not in st.session_state:
+    st.session_state.memory = ConversationBufferMemory(
+        memory_key="chat_history",
+        return_messages=True,
+        input_key="question",
+        output_key="answer"
+   )
+
+memory = st.session_state.memory
 
 # 🔗 QA Chain
 qa_chain = ConversationalRetrievalChain.from_llm(
@@ -85,11 +88,11 @@ user_input = st.text_input("Ask me about your Dubai trip:")
 if user_input:
     # Extract and store values
     extracted_days = extract_days(user_input)
-    if extracted_days:
+    if extracted_days is not None:
         st.session_state.days = extracted_days
 
     extracted_kid_age = extract_kid_age(user_input)
-    if extracted_kid_age:
+    if extracted_kid_age is not None:
         st.session_state.kid_age = extracted_kid_age
 
     # Add facts if known

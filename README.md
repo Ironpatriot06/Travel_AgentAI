@@ -23,29 +23,39 @@ git clone https://github.com/yourusername/dubai-travel-agent.git
 cd dubai-travel-agent
 ```
 
-FOR MacOS
+
+2. Create and activate a virtual environment
+macOS/Linux
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-FOR Windows
+Windows
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
-The required installations are
+
+
+3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+4. Set environment variables
+ ```bash
+GOOGLE_API_KEY=your_gemini_api_key
+```
+
+5. The required installations are
 ```bash
 pip install streamlit langchain google-generativeai langchain-google-genai chromadb tiktoken
 ```
 
-Put your Gemini API key in app.py 
-```bash
-GOOGLE_API_KEY=your_gemini_api_key
-```
-
-To run the Streamlit 
+6. Run the Streamlit
 ```bash
 streamlit run app.py
 ```
+
 

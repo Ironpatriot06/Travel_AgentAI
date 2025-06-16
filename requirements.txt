@@ -3,7 +3,6 @@ langchain-chroma
 langchain-community
 langchain-google-genai
 chromadb
-# Google + OpenAI models
 google-generativeai
 beautifulsoup4
 selenium

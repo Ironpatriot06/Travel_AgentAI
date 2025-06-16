@@ -1,15 +1,17 @@
 import os
 import re
+
 import streamlit as st
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain_chroma import Chroma
+from flight_agent import agent as flight_agent
+
 
 # 🔐 API Key
 os.environ["GOOGLE_API_KEY"] = "AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
-
 # 📚 Load Vector DB
 persist_directory = "vector_db/blogs"
 embedding = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
@@ -38,8 +40,11 @@ Be concise, realistic, and helpful.
 )
 
 # 🤖 LLM
-llm = ChatGoogleGenerativeAI(model="models/gemini-1.5-flash-002", temperature=0.4)
-
+llm = ChatGoogleGenerativeAI(
+    model="models/gemini-1.5-flash-002",
+    temperature=0.3,
+    google_api_key="AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
+)
 # 🧠 Memory
 if "memory" not in st.session_state:
     st.session_state.memory = ConversationBufferMemory(
@@ -61,48 +66,48 @@ qa_chain = ConversationalRetrievalChain.from_llm(
 )
 
 # 🌐 Streamlit UI
-st.title("🧳 Dubai Travel Assistant")
+st.set_page_config(page_title="Dubai Travel Assistant 🌴", page_icon="✈️")
+st.title("Dubai Travel Assistant ✈️🇦🇪")
 
-# 🧠 Init session state
-if "days" not in st.session_state:
-    st.session_state.days = None
-if "kid_age" not in st.session_state:
-    st.session_state.kid_age = None
+st.markdown("Ask me anything about your Dubai trip — itinerary, activities, and now flights too!")
 
-# 🧪 Extraction helpers
-def extract_days(text):
-    match = re.search(r"(\d+)\s*(day|days|night|nights)", text.lower())
-    if match:
-        return int(match.group(1))
-    return None
+# ✏️ User Input
+user_input = st.text_input("Type your travel query here (e.g. plan trip for 4 days with 6-year-old):", key="input")
 
-def extract_kid_age(text):
-    match = re.search(r"(\d+)\s*(year|years)\s*old", text.lower())
-    if match:
-        return int(match.group(1))
-    return None
+# 🗺️ Show chat history
+if "chat_history" not in st.session_state:
+    st.session_state.chat_history = []
 
-# 📩 User input
-user_input = st.text_input("Ask me about your Dubai trip:")
-
+# 📤 On Submit
 if user_input:
-    # Extract and store values
-    extracted_days = extract_days(user_input)
-    if extracted_days is not None:
-        st.session_state.days = extracted_days
+    st.session_state.chat_history.append(("You", user_input))
 
-    extracted_kid_age = extract_kid_age(user_input)
-    if extracted_kid_age is not None:
-        st.session_state.kid_age = extracted_kid_age
+    # ✈️ Flight keyword detection
+    if "flight" in user_input.lower():
+        with st.spinner("Checking flight options..."):
+            # Example: extract pseudo slots
+            origin = st.text_input("From (origin city):", key="origin")
+            destination = st.text_input("To (destination city):", key="destination")
+            dates = st.text_input("Travel dates:", key="dates")
+            budget = st.text_input("Budget:", key="budget")
 
-    # Add facts if known
-    contextual_question = user_input
-    if st.session_state.days:
-        contextual_question += f"\nNote: The user is staying for {st.session_state.days} days."
-    if st.session_state.kid_age:
-        contextual_question += f"\nNote: The user has a {st.session_state.kid_age}-year-old child."
+            if st.button("Find Flights ✈️"):
+                try:
+                    flight_response = flight_agent.run({
+                        "origin": origin,
+                        "destination": destination,
+                        "dates": dates,
+                        "budget": budget
+                    })
+                    st.session_state.chat_history.append(("Assistant (Flight Agent)", flight_response))
+                except Exception as e:
+                    st.error(f"Error fetching flights: {e}")
+    else:
+        with st.spinner("Thinking..."):
+            response = qa_chain.run(user_input)
+            st.session_state.chat_history.append(("Assistant", response))
 
-    # Answer
-    response = qa_chain.run(question=contextual_question)
-    st.write(response)
-
+# 💬 Display chat history
+st.divider()
+for role, message in st.session_state.chat_history:
+    st.markdown(f"**{role}:** {message}")

@@ -11,7 +11,10 @@ from flight_agent import agent as flight_agent
 
 
 # 🔐 API Key
+
+os.environ["GOOGLE_API_KEY"] = "your_api_key"
 os.environ["GOOGLE_API_KEY"] = "AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
+
 # 📚 Load Vector DB
 persist_directory = "vector_db/blogs"
 embedding = GoogleGenerativeAIEmbeddings(model="models/embedding-001")

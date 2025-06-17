@@ -9,6 +9,8 @@ from langchain.prompts import PromptTemplate
 from langchain_community.vectorstores import Chroma  # ✅ Updated import
 
 # 🔐 API Key
+
+os.environ["GOOGLE_API_KEY"] = "your_api_key"
 os.environ["GOOGLE_API_KEY"] = "AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
 
 # 📚 Load Vector DB

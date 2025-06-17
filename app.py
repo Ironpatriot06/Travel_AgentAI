@@ -21,7 +21,7 @@ retriever = vectordb.as_retriever(search_kwargs={"k": 8})
 
 # 🧠 Prompt Template
 custom_prompt = PromptTemplate(
-    input_variables=["chat_history", "question", "context"],
+    input_variables=["chat_history", "question", "context", "num_days", "child_age"],
     template="""
 You are a helpful Dubai travel planning assistant.
 
@@ -31,17 +31,22 @@ Use the following travel blog content:
 Conversation so far:
 {chat_history}
 
+Trip info:
+- Days staying: {num_days}
+- Child age: {child_age}
+
 User asked:
 {question}
 
-Now respond accordingly:
-- If the number of stay days is not already known in the conversation and is not stored, ask the user politely.
-- If child age is not already known in the conversation and is not stored, ask once politely.
-- If both `num_days` and `child_age` are known (you can infer from chat_history), skip asking and generate a personalized Dubai itinerary with relevant activities.
-- Do NOT ask for the same information again if already provided.
+Instructions:
+- If days or child age are marked as "None", politely ask for them.
+- If both are known, generate a personalized 𝘋𝘶𝘣𝘢𝘪 itinerary.
+- Do NOT ask again if you already know them.
+
 Be concise, realistic, and helpful.
 """
 )
+
 
 
 # 🤖 LLM Setup
@@ -78,6 +83,8 @@ qa_chain = ConversationalRetrievalChain.from_llm(
     combine_docs_chain_kwargs={"prompt": custom_prompt},
     output_key="output"
 )
+
+
 
 # 🌐 Streamlit UI
 st.set_page_config(page_title="Dubai Travel Assistant 🌴", page_icon="✈️")
@@ -123,8 +130,11 @@ if user_input:
     elif "flight" not in user_input.lower():
         st.session_state.chat_history.append(("You", user_input))
         with st.spinner("Thinking..."):
-            response = qa_chain.run({"question": user_input})
-            # response = qa_chain.run({"input": user_input})
+            response = qa_chain.run({
+            "question": user_input,
+            "num_days": st.session_state.num_days or "None",
+            "child_age": st.session_state.child_age or "None"
+        })
             st.session_state.chat_history.append(("Assistant", response))
 
 

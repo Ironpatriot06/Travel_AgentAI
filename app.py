@@ -34,11 +34,15 @@ Conversation so far:
 User asked:
 {question}
 
-If the user hasn't mentioned how many days they're staying, politely ask them.
-If days and child age are mentioned, generate a personalized itinerary with activities that suit their stay and the child’s age.
+Now respond accordingly:
+- If the number of stay days is not already known in the conversation and is not stored, ask the user politely.
+- If child age is not already known in the conversation and is not stored, ask once politely.
+- If both `num_days` and `child_age` are known (you can infer from chat_history), skip asking and generate a personalized Dubai itinerary with relevant activities.
+- Do NOT ask for the same information again if already provided.
 Be concise, realistic, and helpful.
 """
 )
+
 
 # 🤖 LLM Setup
 llm = ChatGoogleGenerativeAI(
@@ -84,11 +88,31 @@ st.markdown("Ask me anything about your Dubai trip — itinerary, activities, an
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
+if "num_days" not in st.session_state:
+    st.session_state.num_days = None
+
+if "child_age" not in st.session_state:
+    st.session_state.child_age = None
+
 if "flight_requested" not in st.session_state:
     st.session_state.flight_requested = False
 
 # 📝 User Input
 user_input = st.chat_input("Ask something...")
+
+
+
+
+if user_input:
+    # ✅ Check for number of days
+    days_match = re.search(r"\b(\d+)\s*(days|day)\b", user_input.lower())
+    if days_match:
+        st.session_state.num_days = int(days_match.group(1))
+
+    # ✅ Check for child age
+    age_match = re.search(r"\b(\d+)\s*(years|year)\s*old\b", user_input.lower())
+    if age_match:
+        st.session_state.child_age = int(age_match.group(1))
 
 # 🚦 Input Handling
 if user_input:
@@ -103,6 +127,7 @@ if user_input:
             # response = qa_chain.run({"input": user_input})
             st.session_state.chat_history.append(("Assistant", response))
 
+
 # ✈️ Flight Form
 if st.session_state.flight_requested:
     with st.spinner("Checking flight options..."):
@@ -112,7 +137,6 @@ if st.session_state.flight_requested:
         budget = st.text_input("Budget (INR, optional):", key="budget")
 
         if st.button("Find Flights ✈️"):
-            
             try:
                 query = f"I want to find flights from {origin} to {destination} on {dates}."
                 if budget:
@@ -121,16 +145,33 @@ if st.session_state.flight_requested:
                 flight_response = flight_agent.run(query)
                 st.session_state.chat_history.append(("Assistant (Flight Agent)", flight_response))
                 st.session_state.flight_requested = False
-                st.session_state.flight_options = offers[:3] 
-                if "book option" in user_input.lower():
-                    option_number = int(user_input.strip().split("option")[-1]) - 1
-                    selected_flight = st.session_state.get("flight_options", [])[option_number]
-    
 
+                # st.markdown("### Raw Flight Response")
+                # st.code(flight_response)
+
+                # ✅ Parse response only if it looks like JSON
+                import json
+                if flight_response.strip().startswith("["):
+                    offers = json.loads(flight_response)
+                    if offers:
+                        st.session_state.flight_options = offers[:3]
+
+                        for idx, offer in enumerate(offers[:3], start=1):
+                            st.markdown(
+                                f"""
+                                **Option {idx}**  
+                                ✈️ **Airline:** {offer['airline']}  
+                                🕓 **Departure:** {offer['departure']}  
+                                🛬 **Arrival:** {offer['arrival']}  
+                                💰 **Price:** {offer['price']}
+                                """
+                            )
 
             except Exception as e:
                 st.error(f"Error fetching flights: {e}")
-                st.session_state.flight_requested = False
+
+
+
 
 def book_flight(flight_offer):
     # In real scenario, you'd call Amadeus booking APIs

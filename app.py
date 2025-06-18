@@ -21,29 +21,32 @@ retriever = vectordb.as_retriever(search_kwargs={"k": 8})
 
 # 🧠 Prompt Template
 custom_prompt = PromptTemplate(
-    input_variables=["chat_history", "question", "context", "num_days", "child_age"],
+    input_variables=["chat_history", "question", "context", "num_days", "child_age", "budget", "num_people"],
     template="""
 You are a helpful Dubai travel planning assistant.
 
 Use the following travel blog content:
 {context}
 
-Conversation so far:
-{chat_history}
-
-Trip info:
+User Info:
 - Days staying: {num_days}
 - Child age: {child_age}
+- Budget: {budget}
+- Number of travelers: {num_people}
+
+Conversation so far:
+{chat_history}
 
 User asked:
 {question}
 
 Instructions:
-- If days or child age are marked as "None", politely ask for them.
-- If both are known, generate a personalized 𝘋𝘶𝘣𝘢𝘪 itinerary.
-- Do NOT ask again if you already know them.
+- If any of the fields above are "None", politely ask ONLY for the missing ones.
+- Otherwise, answer the question or generate the itinerary.
+- Do NOT ask again for values already provided.
+- Do NOT infer from chat_history — trust the passed fields instead.
 
-Be concise, realistic, and helpful.
+Be helpful, concise, and avoid repetition.
 """
 )
 
@@ -101,8 +104,15 @@ if "num_days" not in st.session_state:
 if "child_age" not in st.session_state:
     st.session_state.child_age = None
 
+if "budget" not in st.session_state:
+    st.session_state.budget = None
+
 if "flight_requested" not in st.session_state:
     st.session_state.flight_requested = False
+
+if "num_people" not in st.session_state:
+    st.session_state.num_people = None
+
 
 # 📝 User Input
 user_input = st.chat_input("Ask something...")
@@ -111,18 +121,37 @@ user_input = st.chat_input("Ask something...")
 
 
 if user_input:
-    # ✅ Check for number of days
+    # Check for days
     days_match = re.search(r"\b(\d+)\s*(days|day)\b", user_input.lower())
     if days_match:
         st.session_state.num_days = int(days_match.group(1))
+        st.session_state.chat_history.append(("Assistant", f"Got it — planning for {st.session_state.num_days} days!"))
 
-    # ✅ Check for child age
+
+    # Check for child age
     age_match = re.search(r"\b(\d+)\s*(years|year)\s*old\b", user_input.lower())
     if age_match:
         st.session_state.child_age = int(age_match.group(1))
 
+    # Check for people
+    people_match = re.search(r"\b(\d+)\s*(adults|people|persons|travelers|members)\b", user_input.lower())
+    if people_match:
+        st.session_state.num_people = int(people_match.group(1))
+        st.session_state.chat_history.append(("Assistant", f"Noted — {st.session_state.num_people} people traveling."))
+
+    # Check for budget
+    budget_match = re.search(r"(\d{1,3}(?:,\d{3})+|\d+)\s*(inr|rs|rupees)?", user_input.lower())
+    if budget_match:
+        budget_clean = budget_match.group(1).replace(",", "")
+        st.session_state.budget = int(budget_clean)
+        st.session_state.chat_history.append(("Assistant", f"Great! Budget is ₹{st.session_state.budget}."))
+
+
 # 🚦 Input Handling
 if user_input:
+    # extract days, age, budget...
+    ...
+    
     if "flight" in user_input.lower() and not st.session_state.flight_requested:
         st.session_state.flight_requested = True
         st.session_state.chat_history.append(("You", user_input))
@@ -131,11 +160,14 @@ if user_input:
         st.session_state.chat_history.append(("You", user_input))
         with st.spinner("Thinking..."):
             response = qa_chain.run({
-            "question": user_input,
-            "num_days": st.session_state.num_days or "None",
-            "child_age": st.session_state.child_age or "None"
-        })
+                "question": user_input,
+                "num_days": str(st.session_state.num_days) if st.session_state.num_days is not None else "None",
+                "child_age": str(st.session_state.child_age) if st.session_state.child_age is not None else "None",
+                "budget": str(st.session_state.budget) if st.session_state.budget is not None else "None",
+                "num_people": str(st.session_state.num_people) if st.session_state.num_people is not None else "None"
+            })
             st.session_state.chat_history.append(("Assistant", response))
+
 
 
 # ✈️ Flight Form

@@ -10,7 +10,6 @@ from langchain_community.vectorstores import Chroma  # ✅ Updated import
 
 # 🔐 API Key
 
-os.environ["GOOGLE_API_KEY"] = "your_api_key"
 os.environ["GOOGLE_API_KEY"] = "AIzaSyCfbPlEBg4QQF4CwuROqvyn_ZCpKos3Frc"
 
 # 📚 Load Vector DB
@@ -187,9 +186,6 @@ if st.session_state.flight_requested:
                 flight_response = flight_agent.run(query)
                 st.session_state.chat_history.append(("Assistant (Flight Agent)", flight_response))
                 st.session_state.flight_requested = False
-
-                # st.markdown("### Raw Flight Response")
-                # st.code(flight_response)
 
                 # ✅ Parse response only if it looks like JSON
                 import json

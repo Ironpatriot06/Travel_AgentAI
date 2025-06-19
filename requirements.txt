@@ -13,3 +13,6 @@ PyYAML
 python-dotenv
 streamlit
 protobuf
+langgraph
+langchain-core
+langsmith

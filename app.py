@@ -143,7 +143,7 @@ if user_input:
     if budget_match:
         budget_clean = budget_match.group(1).replace(",", "")
         st.session_state.budget = int(budget_clean)
-        st.session_state.chat_history.append(("Assistant", f"Great! Budget is ₹{st.session_state.budget}."))
+        # st.session_state.chat_history.append(("Assistant", f"Great! Budget is ₹{st.session_state.budget}."))
 
 
 # 🚦 Input Handling
